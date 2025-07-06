@@ -56,11 +56,11 @@ func (cfg *apiConfig) handlerUploadThumbnail(w http.ResponseWriter, r *http.Requ
 
 	//reading all image data into a byte slice
 	//var imageData []byte
-	imageData, err := io.ReadAll(fileData)
-	if err != nil {
-		respondWithError(w, http.StatusBadRequest, "couldn't read file", err)
-		return
-	}
+	// imageData, err := io.ReadAll(fileData)
+	// if err != nil {
+	// 	respondWithError(w, http.StatusBadRequest, "couldn't read file", err)
+	// 	return
+	// }
 
 	//get the video metadata from the sqlite database
 	dbVideo, err := cfg.db.GetVideo(videoID)
@@ -75,8 +75,8 @@ func (cfg *apiConfig) handlerUploadThumbnail(w http.ResponseWriter, r *http.Requ
 	}
 
 	//save thumbnail to global map
-	thumbNail := thumbnail{data: imageData, mediaType: mediaType}
-	videoThumbnails[videoID] = thumbNail
+	// thumbNail := thumbnail{data: imageData, mediaType: mediaType}
+	// videoThumbnails[videoID] = thumbNail
 
 	//updating handler to store the files on the file system on the /assets directory
 	//path is /assets/<videoID>.<file extension>
@@ -98,7 +98,9 @@ func (cfg *apiConfig) handlerUploadThumbnail(w http.ResponseWriter, r *http.Requ
 	}
 
 	//update the thumbnail url
-	var thumbnailUrl = fmt.Sprintf("http://localhost:%s/%s/%s.%s", cfg.port, cfg.assetsRoot, videoID, mediaType)
+	root := strings.Split(cfg.assetsRoot, ".")[1]
+	fmt.Println(root)
+	var thumbnailUrl = fmt.Sprintf("http://localhost:%s/%s/%s.%s", cfg.port, root, videoID, file_extension)
 
 	dbVideo.ThumbnailURL = &thumbnailUrl
 	cfg.db.UpdateVideo(dbVideo)
